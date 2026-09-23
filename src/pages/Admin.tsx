@@ -286,7 +286,7 @@ export const Admin = () => {
                               {item.nome}
                             </span>
                             <span className="ml-2 shrink-0 rounded border border-amber-500/20 bg-zinc-950/40 px-1.5 py-0.5 text-[10px] font-black text-amber-500">
-                              G - {item.quantidade}x
+                              {item.tamanho} - {item.quantidade}x
                             </span>
                           </div>
                         ))}
