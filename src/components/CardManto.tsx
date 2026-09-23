@@ -41,8 +41,9 @@ export const CardManto = ({ produto }: CardMantoProps) => {
         )}
 
         <img
-          src={`https://wsrv.nl{encodeURIComponent(produto.imagem.replace('https://', ''))}&unrop&output=jpg`}
+          src={`https://weserv.nl{encodeURIComponent(produto.imagem)}&default=ssl`}
           alt={produto.nome}
+          referrerPolicy="no-referrer"
           className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
         />
       </div>
