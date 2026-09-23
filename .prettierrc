@@ -1,0 +1,23 @@
+{
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "semi": true,
+  "trailingComma": "all",
+  "singleQuote": false,
+  "printWidth": 80,
+  "importOrder": [
+    "^react$",
+    "^react-redux$",
+    "^@reduxjs/(.*)$",
+    "^lucide-react$",
+    "<THIRD_PARTY_MODULES>",
+    "^@/components/(.*)$",
+    "^@/pages/(.*)$",
+    "^@/store/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}
