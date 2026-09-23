@@ -4,12 +4,14 @@ import { useDispatch } from "react-redux";
 
 import { ChevronLeft, ShoppingBag } from "lucide-react";
 
+// 🔌 CONEXÕES DO BANCO DE DADOS REAL
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
+// 🟢 CORREÇÃO CRUCIAL: Adicionados todos os sub-componentes do Dialog exigidos no HTML visual
 import {
   Dialog,
   DialogContent,
@@ -20,6 +22,7 @@ import {
 
 import { abrirCarrinho, adicionarManto } from "@/store/cartSlice";
 
+// Contrato estrito para o TypeScript aceitar os dados vindos do Firebase
 interface MantoProduto {
   id: string;
   nome: string;
@@ -36,6 +39,7 @@ export const ProductDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Estados do banco de dados real
   const [produto, setProduto] = useState<MantoProduto | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState<string | null>(
@@ -43,6 +47,7 @@ export const ProductDetail = () => {
   );
   const [mostrarModalEscolha, setMostrarModalEscolha] = useState(false);
 
+  // 📡 FILTRADOR DINÂMICO DO FIRESTORE
   useEffect(() => {
     const buscarMantoNoBanco = async () => {
       if (!id) return;
@@ -57,6 +62,7 @@ export const ProductDetail = () => {
             ...snapshot.data(),
           } as MantoProduto);
         } else {
+          // Se o ID for inválido, aguarda 2 segundos e joga para a vitrine
           setTimeout(() => {
             navigate("/");
           }, 2000);
@@ -75,6 +81,7 @@ export const ProductDetail = () => {
   const handleAdicionarAoCarrinho = () => {
     if (!tamanhoSelecionado || !produto) return;
 
+    // Dispara os dados do Firebase direto para o Redux
     dispatch(
       adicionarManto({
         id: produto.id,
@@ -89,6 +96,7 @@ export const ProductDetail = () => {
     setMostrarModalEscolha(true);
   };
 
+  // Tela de transição estática mantida idêntica ao seu padrão original
   if (carregando || !produto) {
     return (
       <div className="bg-fundo relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 text-zinc-100 antialiased">
