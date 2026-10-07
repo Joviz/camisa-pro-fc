@@ -9,7 +9,7 @@
       <stop offset="75%" stop-color="#FBF5B7"/>
       <stop offset="100%" stop-color="#AA771C"/>
     </linearGradient>
-    <!-- Fundo preto/grafite do site (--color-fundo / --color-painel) -->
+    <!-- Fundo preto/grafite do site (cores fundo e painel do index.css) -->
     <linearGradient id="fundo" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#18181b"/>
       <stop offset="100%" stop-color="#09090b"/>
