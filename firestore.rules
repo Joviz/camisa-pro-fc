@@ -1,0 +1,77 @@
+rules_version = '2';
+
+// Regras do Firestore do Camisa Pro FC.
+// Substituem o "modo teste" (leitura/escrita pública até 18/10/2026).
+// Deploy: firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null;
+    }
+
+    // Mesma allowlist de src/components/RotaAdmin.tsx.
+    // Ideal no futuro: custom claim { admin: true } via Admin SDK.
+    function ehAdmin() {
+      return logado() && (
+        request.auth.token.admin == true ||
+        (request.auth.token.email_verified == true &&
+         request.auth.token.email in ['visuallize.cont@gmail.com'])
+      );
+    }
+
+    // Catálogo: vitrine pública, só o lojista altera.
+    match /produtos/{produtoId} {
+      allow read: if true;
+      allow create, update, delete: if ehAdmin();
+    }
+
+    // Cadastro do cliente (nome, CPF, WhatsApp): só o próprio dono.
+    match /usuarios/{uid} {
+      allow read: if (logado() && request.auth.uid == uid) || ehAdmin();
+
+      allow create: if logado() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nome', 'cpf', 'whatsapp', 'atualizadoEm']);
+
+      allow update: if logado() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['nome', 'cpf', 'whatsapp', 'atualizadoEm']);
+
+      allow delete: if false;
+    }
+
+    // Agendamentos de retirada.
+    match /pedidos/{pedidoId} {
+      // Admin vê todos; cliente só os próprios
+      // (compatível com a query where("usuarioUid", "==", uid) de MeusPedidos).
+      allow read: if ehAdmin()
+        || (logado() && resource.data.usuarioUid == request.auth.uid);
+
+      // Cliente cria pedido apenas em seu nome, sempre "Pendente",
+      // com carimbo do servidor e sem campos extras.
+      allow create: if logado()
+        && request.resource.data.usuarioUid == request.auth.uid
+        && request.resource.data.status == 'Pendente'
+        && request.resource.data.criadoEm == request.time
+        && request.resource.data.itens is list
+        && request.resource.data.itens.size() > 0
+        && request.resource.data.keys().hasOnly([
+             'usuarioUid', 'clienteNome', 'clienteCpf', 'clienteWhatsapp',
+             'itens', 'status', 'criadoEm'
+           ]);
+
+      // Só o lojista muda status.
+      allow update: if ehAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'atualizadoEm'])
+        && request.resource.data.status in ['Pendente', 'Pronto para Retirada', 'Entregue'];
+
+      allow delete: if ehAdmin();
+    }
+
+    // Qualquer outra coleção: bloqueada.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -5,6 +5,7 @@ import { signInWithPopup, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
+import { fecharCarrinho, limparCarrinho } from "@/store/cartSlice";
 import type { RootState } from "@/store/store";
 import { definirUsuario, limparUsuario } from "@/store/userSlice";
 
@@ -55,6 +56,8 @@ export const useAuth = () => {
   const deslogar = async () => {
     try {
       await signOut(auth);
+      dispatch(limparCarrinho()); // 🟢 Evita que o carrinho "vaze" para a próxima conta
+      dispatch(fecharCarrinho());
       dispatch(limparUsuario());
       navigate("/login");
     } catch (error) {

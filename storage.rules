@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// O app não usa Firebase Storage (imagens são URLs externas em produtos.imagem).
+// Tudo bloqueado até existir um caso de uso real.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
